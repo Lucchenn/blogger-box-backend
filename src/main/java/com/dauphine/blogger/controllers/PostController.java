@@ -2,12 +2,14 @@ package com.dauphine.blogger.controllers;
 
 import com.dauphine.blogger.models.Category;
 import com.dauphine.blogger.models.Post;
+import com.dauphine.blogger.services.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Tag(
@@ -16,65 +18,54 @@ import java.util.List;
 )
 @RequestMapping("/v1/posts")
 public class PostController {
-    ;
-    private List<Post> posts;
+    private final PostService service;
+
+    public PostController(PostService service) {
+        this.service = service;
+    }
+
+    @GetMapping()
+    @Operation(
+            summary = "Retrieve all posts",
+            description = "Return every post in the database"
+    )
+    public List<Post> retrieveAllPosts() {
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(
+            summary = "Retrieve a post by id",
+            description = "Return the post corresponding of a certain id"
+    )
+    public Post retrievePostById(@PathVariable UUID id) {
+        return service.getById(id);
+    }
 
     @PostMapping()
     @Operation(
             summary = "Create a new post",
-            description = "Create a new post with specified details"
+            description = "Create a new post regarding a certain title, content, and category id"
     )
-    public void createPost(@RequestBody Post post) {
-        posts.add(post);
+    public Post createPost(@RequestParam String title, @RequestParam String content, @RequestParam UUID categoryId) {
+        return service.create(title, content, categoryId);
     }
 
     @PutMapping("/{id}")
     @Operation(
             summary = "Update an existing post",
-            description = "Update an existing post with specified details"
+            description = "Update a post based on its id"
     )
-    public void updatePost(@PathVariable int id, @RequestBody Post updatedPost) {
-        if (id < posts.size()) {
-            posts.set(id, updatedPost);
-        }
+    public Post updatePost(@PathVariable UUID id, @RequestParam String title, @RequestParam String content, @RequestParam UUID categoryId) {
+        return service.update(id, title, content, categoryId);
     }
 
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Delete an existing post",
-            description = "Delete an existing post based on its id"
+            description = "Delete a post based on its id"
     )
-    public void deletePost ( @PathVariable int id){
-        if (id < posts.size()) {
-            posts.remove(id);
-        }
+    public void deletePost(@PathVariable UUID id) {
+        service.deleteById(id);
     }
-
-    @GetMapping("/orderedByCreationDate")
-    @Operation(
-            summary = "Retrieve all posts ordered by creation date",
-            description = "Return all posts sorted by their creation date"
-    )
-    public List<Post> getAllPostsOrderedByCreationDate () {
-            // Implement logic to retrieve all posts and sort them by creation date
-        return posts;
-    }
-
-    /*
-    @GetMapping("/byCategory/{categoryId}")
-    @Operation(
-            summary = "Retrieve all posts per a category",
-            description = "Return all posts within a certain category"
-    )
-    public List<Post> getAllPostsByCategory ( @PathVariable int categoryId){
-        List<Post> postsByCategory = new ArrayList<>();
-        for (Post post : posts) {
-            if (post.getCategory().getId() == categoryId) {
-                postsByCategory.add(post);
-            }
-        }
-        return postsByCategory;
-    }
-    */
 }
-
