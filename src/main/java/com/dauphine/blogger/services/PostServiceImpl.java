@@ -2,6 +2,7 @@ package com.dauphine.blogger.services;
 
 import com.dauphine.blogger.models.Post;
 import com.dauphine.blogger.models.Category;
+import com.dauphine.blogger.repositories.PostRepository;
 import org.springframework.stereotype.Service;
 
 
@@ -13,80 +14,58 @@ import java.util.UUID;
 @Service
 public class PostServiceImpl implements PostService {
 
-    private final List<Post> temporaryPosts;
-    private final CategoryServiceImpl categoryService;
+    private final PostRepository repository;
 
-
-    public PostServiceImpl(CategoryServiceImpl categoryService) {
-        this.categoryService = categoryService;
-        temporaryPosts = new ArrayList<>();
-        temporaryPosts.add(new Post(UUID.randomUUID(), "First Post", "Content of the first post", new Date(), new Category(UUID.randomUUID(), "Category 1")));
-        temporaryPosts.add(new Post(UUID.randomUUID(), "Second Post", "Content of the second post", new Date(), new Category(UUID.randomUUID(), "Category 2")));
-        temporaryPosts.add(new Post(UUID.randomUUID(), "Third Post", "Content of the third post", new Date(), new Category(UUID.randomUUID(), "Category 3")));
+    public PostServiceImpl(PostRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public List<Post> getAllCategoryById(UUID categoryId) {
-        Category category = categoryService.getById(categoryId);
-        if (category == null) {
-            // Gérer le cas où la catégorie n'existe pas
-            return new ArrayList<>();
+    public List<Post> getAllByCategoryId(UUID categoryId) {
+        List<Post> allPosts = repository.findAll();
+        List<Post> filteredPosts = new ArrayList<>();
+
+        for(Post post : allPosts) {
+            if(post.getCategory() != null && post.getCategory().getId().equals(categoryId)) {
+                filteredPosts.add(post);
+            }
         }
-        return category.getPosts();
+        return filteredPosts;
     }
 
     @Override
     public List<Post> getAll() {
-        return temporaryPosts;
+        return repository.findAll();
     }
 
     @Override
     public Post getById(UUID id) {
-        return temporaryPosts.stream()
-                .filter(post -> id.equals(post.getId()))
-                .findFirst()
+        return repository.findById(id)
                 .orElse(null);
     }
 
     @Override
-    public Post create(String title, String content, UUID categoryId) {
-        Category category = getCategoryById(categoryId);
-        if (category == null) {
-            // Handle invalid category ID
-            return null;
-        }
-        Post post = new Post(UUID.randomUUID(), title, content, new Date(), category);
-        temporaryPosts.add(post);
-        return post;
+    public Post create(String title, String content, Category category) {
+        Post post = new Post(title, content, category);
+        return repository.save(post);
     }
 
 
     @Override
-    public Post update(UUID id, String title, String content, UUID categoryId) {
-        Post postToUpdate = getById(id);
-        if (postToUpdate == null) {
-            // Handle post not found
-            return null;
+    public Post update(UUID id, String title, String content) {
+        Post post = getById(id);
+        if(post != null) {
+            post.setTitle(title);
+            post.setContent(content);
+            return repository.save(post);
         }
-        Category category = getCategoryById(categoryId);
-        if (category == null) {
-            // Handle invalid category ID
-            return null;
-        }
-        postToUpdate.setTitle(title);
-        postToUpdate.setContent(content);
-        postToUpdate.setCategory(category);
-        return postToUpdate;
+        return null;
     }
 
     @Override
-    public void deleteById(UUID id) {
-        temporaryPosts.removeIf(post -> id.equals(post.getId()));
+    public boolean deleteById(UUID id) {
+        repository.deleteById(id);
+        return true;
     }
-
-    private Category getCategoryById(UUID categoryId) {
-        return categoryService.getById(categoryId);
-    }
-
 
 }

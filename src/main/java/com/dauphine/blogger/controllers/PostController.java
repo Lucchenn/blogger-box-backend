@@ -47,8 +47,8 @@ public class PostController {
             summary = "Create a new post",
             description = "Create a new post regarding a certain title, content, and category id"
     )
-    public Post createPost(@RequestParam String title, @RequestParam String content, @RequestParam UUID categoryId) {
-        return service.create(title, content, categoryId);
+    public Post createPost(@RequestParam String title, @RequestParam String content, @RequestParam Category category) {
+        return service.create(title, content, category);
     }
 
     @PutMapping("/{id}")
@@ -56,8 +56,8 @@ public class PostController {
             summary = "Update an existing post",
             description = "Update a post based on its id"
     )
-    public Post updatePost(@PathVariable UUID id, @RequestParam String title, @RequestParam String content, @RequestParam UUID categoryId) {
-        return service.update(id, title, content, categoryId);
+    public Post updatePost(@PathVariable UUID id, @RequestParam String title, @RequestParam String content) {
+        return service.update(id, title, content);
     }
 
     @DeleteMapping("/{id}")
