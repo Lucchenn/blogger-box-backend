@@ -1,21 +1,30 @@
 package com.dauphine.blogger.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name="category")
 public class Category {
 
+    @Id
+    @Column(name="id")
     private UUID id;
+
+    @Column(name="name")
     private String name;
-    private List<Post> posts;
 
 
     public Category() {}
-    public Category(UUID id, String name) {
-        this.id = id;
+    public Category(String name) {
+        this.id = UUID.randomUUID();
         this.name = name;
-        this.posts = new ArrayList<>();
     }
 
 
@@ -34,18 +43,6 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    public void addPost(Post post) {
-        this.posts.add(post);
     }
 
 }
