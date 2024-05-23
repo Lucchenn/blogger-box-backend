@@ -1,5 +1,6 @@
 package com.dauphine.blogger.controllers;
 
+import com.dauphine.blogger.dto.CreationPostRequest;
 import com.dauphine.blogger.models.Category;
 import com.dauphine.blogger.models.Post;
 import com.dauphine.blogger.services.PostService;
@@ -47,8 +48,8 @@ public class PostController {
             summary = "Create a new post",
             description = "Create a new post regarding a certain title, content, and category id"
     )
-    public Post createPost(@RequestParam String title, @RequestParam String content, @RequestParam Category category) {
-        return service.create(title, content, category);
+    public Post createPost(@RequestBody CreationPostRequest request) {
+        return service.create(request.getTitle(), request.getContent(), request.getCategory());
     }
 
     @PutMapping("/{id}")
