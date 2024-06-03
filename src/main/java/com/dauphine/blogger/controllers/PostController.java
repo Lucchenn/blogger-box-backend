@@ -1,7 +1,7 @@
 package com.dauphine.blogger.controllers;
 
 import com.dauphine.blogger.dto.CreationPostRequest;
-import com.dauphine.blogger.models.Category;
+import com.dauphine.blogger.exceptions.PostNotFoundByIdException;
 import com.dauphine.blogger.models.Post;
 import com.dauphine.blogger.services.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +39,13 @@ public class PostController {
             summary = "Retrieve a post by id",
             description = "Return the post corresponding of a certain id"
     )
-    public Post retrievePostById(@PathVariable UUID id) {
-        return service.getById(id);
+    public ResponseEntity<Post> retrievePostById(@PathVariable UUID id) {
+        try {
+            Post post = service.getById(id);
+            return ResponseEntity.ok(post);
+        } catch (PostNotFoundByIdException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping()
@@ -57,8 +62,13 @@ public class PostController {
             summary = "Update an existing post",
             description = "Update a post based on its id"
     )
-    public Post updatePost(@PathVariable UUID id, @RequestParam String title, @RequestParam String content) {
-        return service.update(id, title, content);
+    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestParam String title, @RequestParam String content) {
+        try {
+            Post post = service.update(id, title, content);
+            return ResponseEntity.ok(post);
+        } catch (PostNotFoundByIdException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -66,7 +76,12 @@ public class PostController {
             summary = "Delete an existing post",
             description = "Delete a post based on its id"
     )
-    public void deletePost(@PathVariable UUID id) {
-        service.deleteById(id);
+    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
+        try {
+            service.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (PostNotFoundByIdException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -15,4 +15,6 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
             Where UPPER(category.name) LIKE UPPER(CONCAT('%', :name, '%')) 
             """)
     List<Category> findAllLikeName(@Param("name")String name);
+    List<Category> findByNameContainingIgnoreCase(String name);
+    boolean existsByName(String name);
 }
