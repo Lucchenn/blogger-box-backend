@@ -1,4 +1,5 @@
 Ce projet constitue le backend de l'application Blogger Box. Il est responsable de la gestion des données, de la sécurité et des API nécessaires pour interagir avec le frontend.
+Il a été réalisé dans le cadre de TP de programmation web en M1 MIAGE Alternance à l'université Paris Dauphine. 
 
 Fonctionnalités :
    Gestion des articles de blog:
